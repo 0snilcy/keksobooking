@@ -1,6 +1,6 @@
 'use strict';
 (function () {
-  var PIN_WIDTH = 62;
+  window.PIN_WIDTH = 62;
   window.PIN_HEIGHT = 62;
   window.PIN_HEIGHT_Y = window.PIN_HEIGHT + 22;
   window.mainPin = document.querySelector('.map__pin--main');
@@ -18,7 +18,7 @@
   };
 
 // Создаем функцию добавления координат метки в поле формы
-var address = document.querySelector('#address');
+window.address = document.querySelector('#address');
 window.getAdressInput = function (x, y) {
   var pinX = parseInt(window.mainPin.style.left, 10) + x / 2;
   var pinY = parseInt(window.mainPin.style.top, 10);
@@ -29,10 +29,10 @@ window.getAdressInput = function (x, y) {
     pinY += window.PIN_HEIGHT_Y;
   }
 
-  address.value = pinX + ', ' + pinY;
+  window.address.value = pinX + ', ' + pinY;
 };
 
-window.getAdressInput(PIN_WIDTH, window.PIN_HEIGHT);
+window.getAdressInput(window.PIN_WIDTH, window.PIN_HEIGHT);
 
 // Функция соответствия двух полей формы (количество комнат и количество гостей)
 var roomNumber = document.querySelector('#room_number');

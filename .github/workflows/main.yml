@@ -1,0 +1,19 @@
+name: Publish
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - run: |
+        rm -rf .github/
+        git config user.email "zubov.warrior@gmail.com"
+        git config user.name "Albert Zubov"
+        git add .
+        git commit -m Publish
+        git remote set-url origin https://albertZubov:${{secrets.GITHUB_TOKEN}}@github.com/albertZubov/keksobooking.git
+        git remote -v
+        git push origin HEAD:gh-pages --force
