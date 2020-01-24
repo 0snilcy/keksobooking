@@ -2,8 +2,9 @@
 
 (function () {
 // Функция создания метки на основе клонирования, подставление данных в нее из объекта
+var tagCreationTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
+
 window.tagCreation = function (announcement) {
-  var tagCreationTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
   var tagElement = tagCreationTemplate.cloneNode(true);
 
   tagElement.style.left = announcement.location.x + 'px';

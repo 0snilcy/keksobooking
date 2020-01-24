@@ -16,7 +16,7 @@ var filterCardCreation = window.cardCreation(window.createObj(2));
 // Добавление элемента объявления в DOM
 window.filterMap = document.querySelector('.map__filters-container');
 
-// Объявляем перенные поиска элементов на странице
+// Объявляем переменные поиска элементов на странице
 var formFieldset = document.querySelectorAll('fieldset');
 var formSelect = document.querySelectorAll('select');
 var form = document.querySelector('.ad-form');
@@ -32,15 +32,28 @@ setRemoveFieldDisabled(formFieldset, true);
 setRemoveFieldDisabled(formSelect, true);
 
 // Создаем функцию перевода страницы из неактивного состояни в активное
-var translationActiveState = function () {
+var translationActiveState = function (cards) {
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < cards.length; i++) {
+    fragment.appendChild(window.tagCreation(cards[i]));
+  }
+
   setRemoveFieldDisabled(formFieldset, false);
   setRemoveFieldDisabled(formSelect, false);
-  document.querySelector('.map__pins').appendChild(window.fragment);
+  document.querySelector('.map__pins').appendChild(fragment);
   document.querySelector('.map').insertBefore(filterCardCreation, window.filterMap);
   window.mapEmergence.classList.remove('map--faded');
   form.classList.remove('ad-form--disabled');
   window.getAdressInput(PIN_WIDHT_X, window.PIN_HEIGHT_Y);
 };
+
+// Перевод страницы из активного состояния, в неактивное
+window.translationDeactiveState = function () {
+  setRemoveFieldDisabled(formFieldset, true);
+  setRemoveFieldDisabled(formSelect, true);
+  window.mapEmergence.classList.add('map--faded');
+  form.classList.add('ad-form--disabled');
+}
 
 // Создаем функцию, которая вызывается при нажатии на enter
 var onMapActiveEnterPress = function (evt) {
@@ -56,7 +69,7 @@ window.mainPin.addEventListener('keydown', onMapActiveEnterPress);
 // Добавялем обработчик события на метку по наведению и клику
 window.mainPin.addEventListener('mousedown', function(evt) {
   evt.preventDefault();
-  translationActiveState();
+  window.sendRequestServer(translationActiveState, window.errorHundler, 'GET');
 
   var startCoords = {
     x: evt.clientX,
