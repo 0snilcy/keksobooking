@@ -94,7 +94,7 @@ var removeCard = function () {
 }
 
 // Удаление отображения остальных пинов
-var removePin = function () {
+window.removePin = function () {
   var otherPinMap = document.querySelectorAll('.map__pin:not(.map__pin--main)');
   otherPinMap.forEach(function (item) {
     item.remove();
@@ -128,7 +128,7 @@ var closeSuccessModal = function () {
 var renderForm = function () {
   var modalSuccessClone = similarSuccessTemplate.cloneNode(true);
   submitForm.reset();
-  removePin();
+  window.removePin();
   removeCard();
   resetMainPin();
   window.getAdressInput(window.PIN_WIDTH, window.PIN_HEIGHT);
@@ -141,6 +141,6 @@ var renderForm = function () {
 var submitForm = document.querySelector('.ad-form');
 submitForm.addEventListener('submit', function (evt) {
   evt.preventDefault();
-  window.sendRequestServer(renderForm, window.errorHundler, 'POST', new FormData(submitForm));
+  window.sendRequestServer(renderForm, window.errorHandler, 'POST', new FormData(submitForm));
 });
 })();

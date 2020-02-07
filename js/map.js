@@ -1,7 +1,11 @@
 'use strict';
 (function () {
+  window.fragment = document.createDocumentFragment();
+  var pins = [];
+  var typeHousingMap = document.querySelector('#housing-type');
   var ENTER_KEYCODE = 13;
   var PIN_WIDHT_X = 62;
+  var QUANTITY = 3;
   var COORDS_ADRESS_Y = {
     min: 130,
     max: 630
@@ -31,17 +35,24 @@ var setRemoveFieldDisabled = function (field, status) {
 setRemoveFieldDisabled(formFieldset, true);
 setRemoveFieldDisabled(formSelect, true);
 
+// Рендеринг пинов на страницу
+var renderPins = function(pins) {
+  window.removePin();
+  var takeNumber = pins.length > 5 ? 5 : pins.length;
+  for (var i = 0; i < takeNumber; i++) {
+    window.fragment.appendChild(window.tagCreation(pins[i]));
+  }
+  document.querySelector('.map__pins').appendChild(fragment);
+}
+
 // Создаем функцию перевода страницы из неактивного состояни в активное
 var translationActiveState = function (cards) {
-  var fragment = document.createDocumentFragment();
-  for (var i = 0; i < cards.length; i++) {
-    fragment.appendChild(window.tagCreation(cards[i]));
-  }
+  pins = cards;
+  renderPins(cards);
 
+  document.querySelector('.map').insertBefore(filterCardCreation, window.filterMap);
   setRemoveFieldDisabled(formFieldset, false);
   setRemoveFieldDisabled(formSelect, false);
-  document.querySelector('.map__pins').appendChild(fragment);
-  document.querySelector('.map').insertBefore(filterCardCreation, window.filterMap);
   window.mapEmergence.classList.remove('map--faded');
   form.classList.remove('ad-form--disabled');
   window.getAdressInput(PIN_WIDHT_X, window.PIN_HEIGHT_Y);
@@ -58,7 +69,7 @@ window.translationDeactiveState = function () {
 // Создаем функцию, которая вызывается при нажатии на enter
 var onMapActiveEnterPress = function (evt) {
   if (evt.keyCode === ENTER_KEYCODE) {
-    translationActiveState();
+    window.sendRequestServer(translationActiveState, window.errorHandler, 'GET');
   }
 };
 
@@ -69,7 +80,7 @@ window.mainPin.addEventListener('keydown', onMapActiveEnterPress);
 // Добавялем обработчик события на метку по наведению и клику
 window.mainPin.addEventListener('mousedown', function(evt) {
   evt.preventDefault();
-  window.sendRequestServer(translationActiveState, window.errorHundler, 'GET');
+  window.sendRequestServer(translationActiveState, window.errorHandler, 'GET');
 
   var startCoords = {
     x: evt.clientX,
@@ -116,5 +127,14 @@ window.mainPin.addEventListener('mousedown', function(evt) {
   document.addEventListener('mousemove', onMouseMove);
   document.addEventListener('mouseup', onMouseUp);
 });
+
+var filteredHousingType = function () {
+  var filteredCards = pins.filter(function (e) {
+    return e.offer.type === typeHousingMap.value;
+  });
+  renderPins(filteredCards);
+};
+
+typeHousingMap.addEventListener('change', filteredHousingType);
 })();
 

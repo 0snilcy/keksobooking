@@ -8,7 +8,7 @@
 var similarErrorTemplate = document.querySelector('#error').content.querySelector('.error');
 
 // Функция отрисовки окна ошибки запроса данных с сервера
-window.errorHundler = function (errorMessage) {
+window.errorHandler = function (errorMessage) {
   var addMainModal = document.querySelector('main');
   var modalErrorClone = similarErrorTemplate.cloneNode(true);
 
@@ -30,6 +30,6 @@ window.errorHundler = function (errorMessage) {
       addMainModal.removeChild(errorModal);
     }
   });
-}
+};
 })();
 
