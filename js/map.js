@@ -1,8 +1,21 @@
 'use strict';
 (function () {
   window.fragment = document.createDocumentFragment();
+  var FILTER_DEFAULT = "any";
   var pins = [];
-  var typeHousingMap = document.querySelector('#housing-type');
+
+  var filters = {
+    type: document.querySelector('#housing-type'),
+    price: document.querySelector('#housing-price'),
+    rooms: document.querySelector('#housing-rooms'),
+    guests: document.querySelector('#housing-guests'),
+    features: document.querySelector('#housing-features')
+  };
+
+  var featuresArray = Array.from(filters.features.querySelectorAll('input'));
+
+  var QUANTITY_LOW_PRICE = 10000;
+  var QUANTITY_MIDDLE_PRICE = 50000;
   var ENTER_KEYCODE = 13;
   var PIN_WIDHT_X = 62;
   var QUANTITY = 3;
@@ -128,13 +141,62 @@ window.mainPin.addEventListener('mousedown', function(evt) {
   document.addEventListener('mouseup', onMouseUp);
 });
 
-var filteredHousingType = function () {
-  var filteredCards = pins.filter(function (e) {
-    return e.offer.type === typeHousingMap.value;
-  });
-  renderPins(filteredCards);
+var getPriceFilter = function (quantity) {
+  if (quantity < QUANTITY_LOW_PRICE) {
+    return 'low';
+  } else if (quantity >= QUANTITY_MIDDLE_PRICE && quantity <= QUANTITY_MIDDLE_PRICE) {
+    return 'middle';
+  } else if (quantity > QUANTITY_MIDDLE_PRICE) {
+    return 'high';
+  }
 };
 
-typeHousingMap.addEventListener('change', filteredHousingType);
+var filterByType = window.debounce( function (filteredPins) {
+  var filteredCardsArray = pins.slice(0);
+
+  var featureValues = featuresArray.reduce(function (arr, data) {
+    if (data.checked) {
+      arr.push(data.value);
+    }
+    return arr;
+  }, []);
+
+  console.log (featureValues);
+
+  var filteredPins = filteredCardsArray.filter(function (e) {
+    if (filters.type.value !== 'any' && e.offer.type !== filters.type.value) {
+      return false;
+    }
+
+    if (filters.rooms.value !== 'any' && e.offer.rooms !== parseInt(filters.rooms.value, 10)) {
+      return false;
+    }
+
+    if (filters.guests.value !== 'any' && e.offer.guests !== parseInt(filters.guests.value, 10)) {
+      return false;
+    }
+
+    if (filters.price.value !== 'any' && filters.price.value !== getPriceFilter(e.offer.price)) {
+      return false;
+    }
+
+    if (featureValues.length) {
+      return featureValues.every(function (feature) {
+        return e.offer.features.indexOf(feature) >= 0;
+      })
+    }
+
+    return true;
+  });
+
+  renderPins(filteredPins);
+});
+
+
+filters.type.addEventListener('change', filterByType);
+filters.rooms.addEventListener('change', filterByType);
+filters.guests.addEventListener('change', filterByType);
+filters.price.addEventListener('change', filterByType);
+filters.features.addEventListener('change', filterByType);
 })();
 
