@@ -69,14 +69,18 @@ var translationActiveState = function (cards) {
   window.mapEmergence.classList.remove('map--faded');
   form.classList.remove('ad-form--disabled');
   window.getAdressInput(PIN_WIDHT_X, window.PIN_HEIGHT_Y);
+  window.createImgHousing();
 };
 
 // Перевод страницы из активного состояния, в неактивное
 window.translationDeactiveState = function () {
+  var previewHousing = document.querySelector('.ad-form__photo img');
+
   setRemoveFieldDisabled(formFieldset, true);
   setRemoveFieldDisabled(formSelect, true);
   window.mapEmergence.classList.add('map--faded');
   form.classList.add('ad-form--disabled');
+  window.imageHousing.removeChild(previewHousing);
 }
 
 // Создаем функцию, которая вызывается при нажатии на enter
@@ -89,29 +93,24 @@ var onMapActiveEnterPress = function (evt) {
 // Добавялем обработчик события на метку по нажатию на enter
 window.mainPin.addEventListener('keydown', onMapActiveEnterPress);
 
+var Coordinate = function (x, y) {
+  this.x = x;
+  this.y = y;
+}
 
 // Добавялем обработчик события на метку по наведению и клику
 window.mainPin.addEventListener('mousedown', function(evt) {
   evt.preventDefault();
   window.sendRequestServer(translationActiveState, window.errorHandler, 'GET');
 
-  var startCoords = {
-    x: evt.clientX,
-    y: evt.clientY
-  };
+  var startCoords = new Coordinate(evt.clientX, evt.clientY);
 
   var onMouseMove = function (moveEvt) {
     moveEvt.preventDefault();
 
-    var shift = {
-      x: startCoords.x - moveEvt.clientX,
-      y: startCoords.y - moveEvt.clientY
-    };
+    var shift = new Coordinate(startCoords.x - moveEvt.clientX, startCoords.y - moveEvt.clientY);
 
-    startCoords = {
-      x: moveEvt.clientX,
-      y: moveEvt.clientY
-    };
+    startCoords = new Coordinate(moveEvt.clientX, moveEvt.clientY);
 
     if (startCoords.y < COORDS_ADRESS_Y.min || startCoords.y > COORDS_ADRESS_Y.max) {
       startCoords.y = COORDS_ADRESS_Y.min + 'px';
