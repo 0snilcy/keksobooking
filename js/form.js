@@ -5,8 +5,6 @@
   window.PIN_HEIGHT_Y = window.PIN_HEIGHT + 22;
   window.mainPin = document.querySelector('.map__pin--main');
   var ESC_KEYCODE = 27;
-  var DEFAULT_MAIN_PIN_X = 570;
-  var DEFAULT_MAIN_PIN_Y = 375;
   var ROOMS_GUESTS_CONNECT = {
     1: [1],
     2: [1, 2],
@@ -85,28 +83,6 @@ var getTimeinConnectTimeout = function (evt) {
 timeIn.addEventListener('input', getTimeinConnectTimeout);
 timeOut.addEventListener('input', getTimeinConnectTimeout);
 
-// Удаление отображения активной карточки отеля
-var removeCard = function () {
-  var card = document.querySelector('.map__card');
-  if (card) {
-    window.mapEmergence.removeChild(card);
-  };
-}
-
-// Удаление отображения остальных пинов
-window.removePin = function () {
-  var otherPinMap = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-  otherPinMap.forEach(function (item) {
-    item.remove();
-  })
-};
-
-// Возвращение активного пина к дефолтному состоянию
-var resetMainPin = function () {
-  mainPin.style.left = DEFAULT_MAIN_PIN_X + 'px';
-  mainPin.style.top = DEFAULT_MAIN_PIN_Y + 'px';
-}
-
 // Нахождение в Темплэйте окна успешной отправки формы
 var similarSuccessTemplate = document.querySelector('#success').content.querySelector('.success');
 
@@ -127,20 +103,22 @@ var closeSuccessModal = function () {
 
 var renderForm = function () {
   var modalSuccessClone = similarSuccessTemplate.cloneNode(true);
-  submitForm.reset();
-  window.removePin();
-  removeCard();
-  resetMainPin();
-  window.getAdressInput(window.PIN_WIDTH, window.PIN_HEIGHT);
   window.translationDeactiveState();
   document.body.insertAdjacentElement('afterbegin', modalSuccessClone);
   closeSuccessModal();
 }
 
 // Добавляем обрабочки события на кнопку отправки формы на сервер через AJAX
-var submitForm = document.querySelector('.ad-form');
+window.submitForm = document.querySelector('.ad-form');
 submitForm.addEventListener('submit', function (evt) {
   evt.preventDefault();
   window.sendRequestServer(renderForm, window.errorHandler, 'POST', new FormData(submitForm));
 });
+
+// Cбрасывает страницу в исходное неактивное состояние
+var resetButton = document.querySelector('.ad-form__reset');
+resetButton.addEventListener('click', function (evt) {
+  evt.preventDefault();
+  window.translationDeactiveState();
+})
 })();

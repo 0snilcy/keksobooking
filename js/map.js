@@ -16,6 +16,8 @@
 
   var QUANTITY_LOW_PRICE = 10000;
   var QUANTITY_MIDDLE_PRICE = 50000;
+  var DEFAULT_MAIN_PIN_X = 570;
+  var DEFAULT_MAIN_PIN_Y = 375;
   var ENTER_KEYCODE = 13;
   var PIN_WIDHT_X = 62;
   var QUANTITY = 3;
@@ -27,9 +29,6 @@
 // Нахождение и удаление класса появления карты
 window.mapEmergence = document.querySelector('.map');
 
-// Задаю переменную для вызова функции
-var filterCardCreation = window.cardCreation(window.createObj(2));
-
 // Добавление элемента объявления в DOM
 window.filterMap = document.querySelector('.map__filters-container');
 
@@ -37,6 +36,28 @@ window.filterMap = document.querySelector('.map__filters-container');
 var formFieldset = document.querySelectorAll('fieldset');
 var formSelect = document.querySelectorAll('select');
 var form = document.querySelector('.ad-form');
+
+// Удаление отображения активной карточки отеля
+var removeCard = function () {
+  var card = document.querySelector('.map__card');
+  if (card) {
+    window.mapEmergence.removeChild(card);
+  };
+}
+
+// Удаление отображения остальных пинов
+var removePin = function () {
+  var otherPinMap = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+  otherPinMap.forEach(function (item) {
+    item.remove();
+  })
+};
+
+// Возвращение активного пина к дефолтному состоянию
+var resetMainPin = function () {
+  mainPin.style.left = DEFAULT_MAIN_PIN_X + 'px';
+  mainPin.style.top = DEFAULT_MAIN_PIN_Y + 'px';
+}
 
 // Добавляем и удаляем атрибуты к полям формы
 var setRemoveFieldDisabled = function (field, status) {
@@ -50,7 +71,7 @@ setRemoveFieldDisabled(formSelect, true);
 
 // Рендеринг пинов на страницу
 var renderPins = function(pins) {
-  window.removePin();
+  removePin();
   var takeNumber = pins.length > 5 ? 5 : pins.length;
   for (var i = 0; i < takeNumber; i++) {
     window.fragment.appendChild(window.tagCreation(pins[i]));
@@ -63,24 +84,39 @@ var translationActiveState = function (cards) {
   pins = cards;
   renderPins(cards);
 
-  document.querySelector('.map').insertBefore(filterCardCreation, window.filterMap);
   setRemoveFieldDisabled(formFieldset, false);
   setRemoveFieldDisabled(formSelect, false);
   window.mapEmergence.classList.remove('map--faded');
   form.classList.remove('ad-form--disabled');
   window.getAdressInput(PIN_WIDHT_X, window.PIN_HEIGHT_Y);
-  window.createImgHousing();
 };
 
 // Перевод страницы из активного состояния, в неактивное
 window.translationDeactiveState = function () {
-  var previewHousing = document.querySelector('.ad-form__photo img');
-
+  window.submitForm.reset();
+  removePin();
+  removeCard();
+  resetMainPin();
+  window.getAdressInput(window.PIN_WIDTH, window.PIN_HEIGHT);
   setRemoveFieldDisabled(formFieldset, true);
   setRemoveFieldDisabled(formSelect, true);
   window.mapEmergence.classList.add('map--faded');
   form.classList.add('ad-form--disabled');
-  window.imageHousing.removeChild(previewHousing);
+  removeAvatarImage();
+  removeHousingImage();
+}
+
+var removeAvatarImage = function () {
+  window.imageAvatar.src = 'img/muffin-grey.svg';
+};
+
+var removeHousingImage = function () {
+  var image = document.querySelectorAll('.ad-form__photo img');
+  if (image) {
+    while (window.imageHousing.firstChild) {
+      window.imageHousing.removeChild(window.imageHousing.firstChild);
+    }
+  }
 }
 
 // Создаем функцию, которая вызывается при нажатии на enter
@@ -188,6 +224,7 @@ var filterByType = window.debounce( function (filteredPins) {
     return true;
   });
 
+  window.closeCard();
   renderPins(filteredPins);
 });
 
